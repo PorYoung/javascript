@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by PorYoung on 2017/7/28.
  * use this alert to replace javascript default alert
  * 参数设置
