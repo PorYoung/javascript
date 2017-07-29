@@ -138,14 +138,16 @@ digit =
 //定义画布宽和高,点的半径
 var WIDTH = 1024, HEIGHT = 768, RADIUS = parseInt(WIDTH/200);
 //定义时间
-var preDate = null,h = 0,m = 0,s = 0,curDate = null,curHour = 0,curMinute = 0,curSecond = 0,hflag = 0,mflag = 0,sflag = 0; 
+var preDate = null,h = 0,m = 0,s = 0,curDate = null,curHour = 0,curMinute = 0,curSecond = 0,hflag = {one:0,ten:0},mflag = {one:0,ten:0},sflag = {one:0,ten:0}; 
 //定义小球
-var balls = [],g = 2;
+var balls = [];
+var color = ["rgb(239,206,232)","rgb(243,215,181)","rgb(253,255,223)","rgb(218,249,202)","rgb(199,179,129)"];
 //在DOM中指定容器内创建canvas,可以指定宽高，默认为浏览器可见区域的宽高
 function createCanvas(id,w,h){
 	//判断传入参数是否为string，默认为根元素或body
 	if(typeof(id)!=="string") var ele = document.documentElement || document.body;
 	else var ele = document.getElementById(id);
+//	ele.style.overflow = "hidden";
 	var canvas = document.createElement('canvas');
 	canvas.id = "canvas";
 	canvas.style.height = "100%";
@@ -159,7 +161,7 @@ function createCanvas(id,w,h){
 		HEIGHT = parseInt(h);	
 	}else{
 		WIDTH = document.documentElement.clientWidth;
-		HEIGHT = document.documentElement.clientHeight;		
+		HEIGHT = document.documentElement.clientHeight-30;		
 	}
 	RADIUS = parseInt(WIDTH/200);
 	canvas.width = WIDTH;
@@ -170,7 +172,7 @@ function createCanvas(id,w,h){
 
 //绘制时钟数字
 function drawClock(ctx){
-	var draw = function(ctx,startX,startY,num){
+	var draw = function(ctx,startX,startY,num,flag){
 			for(var i = 0;i < digit[num].length;i++){
 			for(var j = 0;j < digit[num][i].length;j++){
 				if(digit[num][i][j] === 1){
@@ -180,43 +182,59 @@ function drawClock(ctx){
 					ctx.fillStyle = "rgb(223,231,245)";
 					ctx.fill();
 					//添加小球
-					var aBall = {
+					if(flag){
+						var aBall = {
 						x: startX+RADIUS*j*2+GAP*j,
 						y: startY+RADIUS*i*2+GAP*i,
-						vx: -5,
-						vy: -5
+						vx: parseInt(Math.pow(-1,i)*10*Math.random()),
+						vy: -5,
+						g: 2,
+						time: curDate.getTime()
+						}
+						balls.push(aBall);	
 					}
-					balls.push(aBall);
 				}
 			}
 		}
 	}
-	var startX = WIDTH/10 + RADIUS, startY = HEIGHT/5 + RADIUS, GAP = RADIUS;
+	var startX = WIDTH/10 + RADIUS, startY = HEIGHT*1/5 + RADIUS, GAP = RADIUS;
 	var num = parseInt(h/10);
-	draw(ctx,startX,startY,num);
+	if(hflag.ten === 1){
+		draw(ctx,startX,startY,num,true);
+	}else draw(ctx,startX,startY,num,false);
 	startX += RADIUS*7+GAP*9;
 	num = parseInt(h%10);
-	draw(ctx,startX,startY,num);
+	if(hflag.one === 1){
+		draw(ctx,startX,startY,num,true);
+	}else draw(ctx,startX,startY,num,false);
 	//画冒号
 	startX += RADIUS*7*2+GAP*10;
 	num = 10;
 	draw(ctx,startX,startY,num);
 	startX += RADIUS*4*2+GAP*7;
 	num = parseInt(m/10);
-	draw(ctx,startX,startY,num);
+	if(mflag.ten === 1){
+		draw(ctx,startX,startY,num,true);
+	}else draw(ctx,startX,startY,num,false);
 	startX += RADIUS*7*2+GAP*10;
 	num = parseInt(m%10);
-	draw(ctx,startX,startY,num);
+	if(mflag.one === 1){
+		draw(ctx,startX,startY,num,true);
+	}else draw(ctx,startX,startY,num,false);
 	//画冒号
 	startX += RADIUS*7*2+GAP*10;
 	num = 10;
 	draw(ctx,startX,startY,num);
 	startX += RADIUS*4*2+GAP*7;
 	num = parseInt(s/10);
-	draw(ctx,startX,startY,num);
+	if(sflag.ten === 1){
+		draw(ctx,startX,startY,num,true);
+	}else draw(ctx,startX,startY,num,false);
 	startX += RADIUS*7*2+GAP*10;
 	num = parseInt(s%10);
-	draw(ctx,startX,startY,num);
+	if(sflag.one === 1){
+		draw(ctx,startX,startY,num,true);
+	}else draw(ctx,startX,startY,num,false);
 }
 
 //绘制彩色小球
@@ -225,7 +243,7 @@ function drawBalls(ctx){
 		ctx.beginPath();
 		ctx.arc(balls[i].x,balls[i].y,RADIUS,
 			0,Math.PI*2,false);
-		ctx.fillStyle = "rgb(112,132,145)";
+		ctx.fillStyle = color[parseInt(6*Math.random()-1)];
 		ctx.fill();
 	}
 }
@@ -236,41 +254,57 @@ function update(){
 	curSecond = curDate.getSeconds();
 	curMinute = curDate.getMinutes();
 	curHour = curDate.getHours();
-	
+	var ind = 0;
 	for(var i = 0;i < balls.length;i++){
-		if(balls[i].x <= 0 || balls[i].x >= WIDTH){
-			balls[i] = balls[i+1];
-			i--;
-			continue;
+		if(balls[i].y <= 0 || curDate.getTime()-balls[i].time >= 20000 ) continue;
+		if(balls[i].y >= HEIGHT){
+			balls[i].vy = -balls[i].vy*0.75;
 		}
+		if(balls[i].x <= 0){ balls[i].vx = -balls[i].vx*0.95;}
+		if(balls[i].x >= WIDTH){ balls[i].vx = -balls[i].vx*0.95;}
+		balls[ind++] = balls[i];
 		balls[i].x += balls[i].vx;
-		balls[i].vy += g;
+		balls[i].vy += balls[i].g;
 		balls[i].y += balls[i].vy;
 	}
-	balls.length = Math.min(balls.length,500);
+	balls.length = Math.min(ind,1000);
 }
 
 window.onload = function(){
 	var context = createCanvas();
 	preDate = new Date();
-	h = preDate.getHours();
-	m = preDate.getMinutes();
-	s = preDate.getSeconds();
+	h = curHour = preDate.getHours();
+	m = curMinute = preDate.getMinutes();
+	s = curSecond = preDate.getSeconds();
 	drawClock(context);
 	setInterval(function(){
 		update();
 		if(curSecond !== s){
-			s = curSecond;
+			sflag.ten=parseInt(s/10)===parseInt(curSecond/10)?0:1;
+			sflag.one=parseInt(s%10)===parseInt(curSecond%10)?0:1;
 			if(curMinute !== m){
-				m = curMinute;	
+				mflag.ten=parseInt(m/10)===parseInt(curMinute/10)?0:1;
+				mflag.one=parseInt(m%10)===parseInt(curMinute%10)?0:1;
 			}
 			if(curHour !== h){
-				h = curHour;
+				hflag.ten=parseInt(h/10)===parseInt(curHour/10)?0:1;
+				hflag.one=parseInt(h%10)===parseInt(curHour%10)?0:1;
 			}
-			context.clearRect(0,0,WIDTH,HEIGHT);
-			drawClock(context);
+//			context.clearRect(0,0,WIDTH,HEIGHT);
+//			drawClock(context);
+//			sflag.one = sflag.ten = mflag.one = mflag.ten = hflag.one = hflag.ten = 0;
 		}
-//		drawBalls(context);
-	},100);
+//		s = curSecond;
+//		h = curHour;
+//		m = curMinute;
+//		update();
+		context.clearRect(0,0,WIDTH,HEIGHT);
+		drawClock(context);
+		drawBalls(context);
+		s = curSecond;
+		h = curHour;
+		m = curMinute;
+		sflag.one = sflag.ten = mflag.one = mflag.ten = hflag.one = hflag.ten = 0;
+	},50);
 }
 
