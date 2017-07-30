@@ -189,7 +189,8 @@ function drawClock(ctx){
 						vx: parseInt(Math.pow(-1,i)*10*Math.random()),
 						vy: -5,
 						g: 2,
-						time: curDate.getTime()
+						time: curDate.getTime(),
+						color: color[parseInt(6*Math.random()-1)]
 						}
 						balls.push(aBall);	
 					}
@@ -243,7 +244,8 @@ function drawBalls(ctx){
 		ctx.beginPath();
 		ctx.arc(balls[i].x,balls[i].y,RADIUS,
 			0,Math.PI*2,false);
-		ctx.fillStyle = color[parseInt(6*Math.random()-1)];
+//		ctx.fillStyle = color[parseInt(6*Math.random()-1)];
+		ctx.fillStyle = balls[i].color;
 		ctx.fill();
 	}
 }
