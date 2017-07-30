@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>img</title>
+    <script src="js/intervalChangeImage.js"></script>
+    <style>
+        #container{
+            position: relative;
+            width: 100%;
+            height: 624px;
+            overflow: hidden;
+        }
+        #container img{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top:0;
+            transition: opacity 1s;
+        }
+        .img-btn{
+            position: absolute;
+            height: 1em;
+            width: 1em;
+            border-radius: 50%;
+            bottom: 1em;
+            left: 50%;
+            margin-left: -1em;
+            background: #eeeeee;
+            transition: all 1s;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <img src="images/1.png" />
+        <img src="images/2.JPG" />
+        <img src="images/1.jpg" />
+        <i class="img-btn"></i>
+        <i class="img-btn" style="margin-left: 15px;"></i>
+        <i class="img-btn" style="margin-left: 45px;"></i>
+    </div>
+</body>
+</html>

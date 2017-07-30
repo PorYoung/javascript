@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>intervalImg</title>
+    <style>
+        .wrap{
+            padding: 0 calc(50% - 400px);
+        }
+        .wrap span{
+            display: block;
+            font-size: 20px;
+            color: #333;
+        }
+        #container{
+            height: 200px;
+            width: 800px;
+            overflow: hidden;
+            white-space: nowrap;
+            -webkit-padding-start: 0;
+        }
+        #show{
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            top: calc(50% - 150px);
+            left: calc(50% - 200px);
+            opacity: 0;
+            transition: all 1s;
+        }
+        #container li{
+            display: inline-block;
+            height: 99%;
+            width: 25%;
+            border: 1px solid #fff;
+            opacity: .8;
+            cursor: pointer;
+        }
+        #container li:hover{
+            border: solid 1px #333;
+            opacity: 1;
+            transition: opacity 1s;
+        }
+        #container li:nth-child(1){
+            /*时间随li个数改变*/
+            animation: move 20s linear infinite alternate;
+        }
+        #container li img{
+            width: 100%;
+            height: 100%;
+        }
+        @keyframes move {
+            from{
+                margin-left: 0;
+            }
+            to{
+                /*值随li个数改变*/
+                margin-left: -1000px;
+            }
+        }
+    </style>
+    <script>
+        window.onload = mshover;
+        function mshover() {
+            var ul = document.getElementById('container'),  //ul id更改这里
+                list = ul.getElementsByTagName('li');
+            for(var i = 0;i < list.length;i++){
+                list[i].onmouseover = function () {
+                    list[0].style.animationPlayState = 'paused';
+                    var imgSrc = this.getElementsByTagName('img')[0].src,
+                        showDiv = document.getElementById('show'),         //展示div id更改这里
+                        showImg = showDiv.getElementsByTagName('img')[0];
+                    showImg.src = imgSrc;
+                    //可能需要更改层级
+                    //showDiv.style.zIndex =
+                    showDiv.style.opacity = '1';
+                    showDiv.style.top = 'calc(50% - 200px)';
+                };
+                list[i].onmouseout = function () {
+                    list[0].style.animationPlayState = 'running';
+                    var showDiv = document.getElementById('show'),         //展示div id更改这里
+                        showImg = showDiv.getElementsByTagName('img')[0];
+                    //可能需要更改层级
+                    //showDiv.style.zIndex =
+                    showDiv.style.opacity = 0;
+                    showDiv.style.top = 'calc(50% - 150px)';
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="wrap">
+        <span>轮播图</span>
+        <ul id="container">
+            <li><img src="img/img01.jpg" /></li>
+            <li><img src="img/img02.jpg" /></li>
+            <li><img src="img/img03.jpg" /></li>
+            <li><img src="img/img04.jpg" /></li>
+            <li><img src="img/img05.jpg" /></li>
+            <li><img src="img/img06.jpg" /></li>
+            <li><img src="img/img07.jpg" /></li>
+            <li><img src="img/img08.jpg" /></li>
+        </ul>
+        <div id="show"><img src="#" height="100%" width="100%"/></div>
+    </div>
+</body>
+</html>
