@@ -9,7 +9,7 @@
 var WIDTH = 600, HEIGHT = 600;
 //"up":上,"right":右,"down":下,"left":左
 var left="left",up="up",down="down",right="right";
-var snake = new(function () {
+function snakeConstruct() {
     this.body_radius=10;
     this.direction=left;
     this.MAX_LENGTH=200;
@@ -112,7 +112,9 @@ var snake = new(function () {
             }
         }
     }
-})();
+}
+var snake = new snakeConstruct();
+
 // window.onkeyup = function (event) {
 //     var e = event || window.event;
 //     snake.turn(e.keyCode.toString());
@@ -133,14 +135,15 @@ function createCanvas(){
 	canvas.style.border = "1px solid #ccc";
 	return canvas.getContext('2d');
 }
-
+function keybordEventListen() {
+    var e = event || window.event;
+    snake.turn(e.keyCode.toString());
+}
+var timer = null;
 function startGame(){
 	var context = createCanvas();
-	addEventListener("keyup",function (event) {
-        var e = event || window.event;
-        snake.turn(e.keyCode.toString());
-    },false);
-	setInterval(function () {
+	addEventListener("keyup",keybordEventListen,false);
+	timer = setInterval(function () {
 	    context.clearRect(0,0,WIDTH,HEIGHT);
         snake.drawSnake(context);
         snake.drawFood(context);
@@ -151,3 +154,9 @@ function startGame(){
     },100);
 }
 
+function stopGame() {
+    clearInterval(timer);
+    document.body.removeChild(document.getElementById('canvas').parentNode);
+    removeEventListener("keyup",keybordEventListen);
+    snake = new snakeConstruct();
+}
